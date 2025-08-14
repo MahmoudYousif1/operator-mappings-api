@@ -1,0 +1,87 @@
+[
+  {
+    "country": "Argentina",
+    "e164": [
+      "5407",
+      "54079",
+      "3368900890017"
+    ],
+    "e212": [
+      "72201",
+      "72202",
+      "72203",
+      "72204",
+      "72205",
+      "72206",
+      "72207",
+      "72208",
+      "72209"
+    ],
+    "iso2": "AR",
+    "iso3": "ARG",
+    "name": "Telefónica Móviles Argentina S.A.",
+    "realm": [
+      "epc.mnc007.mcc722.3gppnetwork.org",
+      "epc.mnc010.mcc722.3gppnetwork.org"
+    ],
+    "tadig": [
+      "ARGTM",
+      "ARG01"
+    ]
+  },
+  {
+    "country": "Chile",
+    "e164": [
+      "569",
+      "5691"
+    ],
+    "e212": [
+      "73001"
+    ],
+    "iso2": "CL",
+    "iso3": "CHL",
+    "name": "Telefónica del Sur",
+    "realm": [
+      "epc.mncxx.mcc730.3gppnetwork.org"
+    ],
+    "tadig": [
+      "CHLTS"
+    ]
+  },
+  {
+    "country": "Bolivia (Plurinational State Of)",
+    "e164": [
+      "591"
+    ],
+    "e212": [
+      "73601"
+    ],
+    "iso2": "BO",
+    "iso3": "BOL",
+    "name": "Entel PCS",
+    "realm": [
+      "epc.mncxx.mcc736.3gppnetwork.org"
+    ],
+    "tadig": [
+      "BOENT"
+    ]
+  },
+  {
+    "country": "Paraguay",
+    "e164": [
+      "595"
+    ],
+    "e212": [
+      "74401"
+    ],
+    "iso2": "PY",
+    "iso3": "PRY",
+    "name": "Claro Paraguay",
+    "realm": [
+      "epc.mncxx.mcc744.3gppnetwork.org"
+    ],
+    "tadig": [
+      "PYCLARO"
+    ]
+  }
+]

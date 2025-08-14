@@ -1,0 +1,78 @@
+# Deployment settings
+deploymentName: operator-mappings-api-helm
+replicaCount: 1
+
+# Pod labels/selectors
+appLabels:
+  app.kubernetes.io/name: operator-mappings-api
+  app.kubernetes.io/instance: operator-mappings-api
+
+# Container image & port
+image:
+  repository: operator-mappings-api
+  pullPolicy: IfNotPresent
+  tag: latest
+containerPort: 8080
+
+# Service
+service:
+  type: NodePort
+  port: 8080
+  targetPort: 8080
+  nodePort: 30001
+
+# ServiceAccount
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+# Probes
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 15
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+
+# Ingress
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+# Resources
+resources: {}
+volumes: []
+volumeMounts: []
+
+# Autoscaling
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+# Pod-level settings
+imagePullSecrets: []
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: '{{ include "helm.fullname" . }}-test-connection'
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command:
+        - sh
+        - -c
+        - |
+          wget --spider --timeout=5 http://{{ include "helm.fullname" . }}:{{ .Values.service.port }} || exit 1
+  restartPolicy: Never

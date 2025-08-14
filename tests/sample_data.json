@@ -1,0 +1,70 @@
+[
+  {
+    "country": "Argentina",
+    "e164": ["3368900890017"],
+    "e212": ["72207", "722010", "3368900890017"],
+    "iso2": "AR",
+    "iso3": "ARG",
+    "name": "Telefónica Móviles Argentina",
+    "realm": [
+      "epc.mnc007.mcc722.3gppnetwork.org",
+      "epc.mnc010.mcc722.3gppnetwork.org"
+    ],
+    "tadig": ["ARGTM", "ARG01"]
+  },
+  {
+    "country": "Chile",
+    "iso2": "CL",
+    "iso3": "CHL",
+    "name": "Movistar Chile",
+    "tadig": ["CHL01"]
+  },
+  {
+    "country": "Brazil",
+    "iso2": "BR",
+    "iso3": "BRA",
+    "name": "Vivo",
+    "tadig": ["BRA01"]
+  },
+  {
+    "country": "Bolivia",
+    "iso2": "BO",
+    "iso3": "BOL",
+    "name": "ENTEL Bolivia",
+    "tadig": ["BOL01"]
+  },
+  {
+    "country": "Paraguay",
+    "iso2": "PY",
+    "iso3": "PRY",
+    "name": "Tigo Paraguay",
+    "tadig": ["PRY01"]
+  },
+  {
+    "country": "Uruguay",
+    "iso2": "UY",
+    "iso3": "URY",
+    "name": "Antel",
+    "tadig": ["URY01"]
+  },
+  {
+    "country": "Romania",
+    "e164": ["40770", "4077000"],
+    "e212": ["22605"],
+    "iso2": "RO",
+    "iso3": "ROU",
+    "name": "ROMTELECOM",
+    "realm": ["epc.mnc005.mcc226.3gppnetwork.org"],
+    "tadig": ["ROM05"]
+  },
+  {
+    "country": "Lebanon",
+    "e164": ["9611", "9614", "9615", "9616"],
+    "e212": null,
+    "iso2": "LB",
+    "iso3": "LBN",
+    "name": "Lebanon Pro",
+    "realm": null,
+    "tadig": ["LBN_GEO"]
+  }
+]

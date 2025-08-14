@@ -1,0 +1,9 @@
+pub mod create;
+pub mod delete;
+pub mod find_roaming_partners;
+pub mod get_operators_by_e212_count;
+pub mod group_operators_by_iso3;
+pub mod network_names;
+pub mod read;
+pub mod update;
+pub mod swagger;

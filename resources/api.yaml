@@ -1,0 +1,439 @@
+openapi: 3.1.0
+info:
+  title: Operator Mappings API
+  version: 1.0.0
+  description: >
+    A RESTful API for managing and querying mobile network operators. 
+    Supports lookup by IMSI/MSISDN/TADIG, full CRUD, network-name listing,
+    country mapping, grouping by E.212 size, and roaming-partner discovery.
+servers:
+  - url: http://{OM-API-Address}/api/v1
+    description: Main API endpoint
+    variables:
+      OM-API-Address:
+        default: 0.0.0.0:8080
+        description: Host and port of the API server
+
+paths:
+  /operators:
+    required: []
+    get:
+      summary: Lookup operator(s) by IMSI, MSISDN or TADIG
+      operationId: read-operator
+      parameters:
+        - name: imsi
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: "^[0-9]+$"
+          description: E.212 (IMSI); numeric only
+        - name: msisdn
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: "^[0-9]+$"
+          description: E.164 (MSISDN); numeric only
+        - name: tadig
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Unique TADIG code
+      responses:
+        '200':
+          description: >
+            If no parameters are provided, returns all operators. 
+            If exactly one valid parameter is provided, returns the matching operator or operators.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Operator'
+        '400':
+          description: Bad request (e.g. invalid lookup keys or non-numeric IMSI/MSISDN)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                InvalidParams:
+                  summary: Too many parameters
+                  value:
+                    code: 400
+                    message: "Please specify exactly one of imsi, msisdn, or tadig."
+                NonNumeric:
+                  summary: Non-numeric IMSI
+                  value:
+                    code: 400
+                    message: "Invalid imsi: must contain only digits."
+        '404':
+          description: No operator found matching the provided identifier
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "Operator not found for tadig=ABC01"
+
+    post:
+      summary: Create a new operator
+      operationId: create-operator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Operator'
+      responses:
+        '201':
+          description: Operator created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operator'
+        '400':
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: "Invalid ISO2: must be exactly two uppercase letters."
+        '409':
+          description: Operator with given TADIG already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 409
+                message: "Duplicate TADIG: operator with tadig='ABC01' already exists."
+
+    put:
+      summary: Replace an existing operator by TADIG
+      operationId: replace-operator
+      parameters:
+        - name: tadig
+          in: query
+          required: true
+          schema:
+            type: string
+          description: TADIG code of the operator to replace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Operator'
+      responses:
+        '200':
+          description: Operator replaced successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operator'
+        '400':
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: "Missing required field: country."
+        '404':
+          description: Operator not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "Operator to replace not found (tadig=XYZ99)."
+
+    patch:
+      summary: Update an existing operator by TADIG
+      operationId: update-operator
+      parameters:
+        - name: tadig
+          in: query
+          required: true
+          schema:
+            type: string
+          description: TADIG code of the operator to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Operator'
+      responses:
+        '200':
+          description: Operator updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operator'
+        '400':
+          description: Validation error or invalid payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                InvalidCountry:
+                  summary: Country contains digits
+                  value:
+                    code: 400
+                    message: "Invalid country: must contain only alphabetic characters or whitespace."
+                DeleteLastTadig:
+                  summary: Attempt to delete only TADIG
+                  value:
+                    code: 400
+                    message: "Cannot delete the only remaining TADIG."
+        '404':
+          description: Operator not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "Operator not found for tadig=ABC01"
+        '409':
+          description: "Conflict: attempting to set a TADIG that already exists"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 409
+                message: "Conflict: tadig 'ABC02' already exists on another operator."
+
+    delete:
+      summary: Delete an operator by TADIG
+      operationId: delete-operator
+      parameters:
+        - name: tadig
+          in: query
+          required: true
+          schema:
+            type: string
+          description: TADIG code of the operator to delete
+      responses:
+        '200':
+          description: Operator deleted successfully
+        '404':
+          description: Operator not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "Operator not found for tadig=ABC03"
+
+  /operators/network-names:
+    required: []
+    get:
+      summary: List all unique network names
+      operationId: list-network-names
+      responses:
+        '200':
+          description: Array of network names
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: "This endpoint does not accept any query parameters."
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Unexpected server error."
+
+  /operators/country-mapping:
+    required: []
+    get:
+      summary: Map ISO3 country code to operators
+      operationId: get-country-mapping
+      parameters:
+        - name: iso3
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 3
+            pattern: "^[A-Za-z]+$"
+          description: Three-letter ISO3 country code
+      responses:
+        '200':
+          description: Mapping of country code to operator list
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Operator'
+        '404':
+          description: No operators found for given ISO3
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "No operators found in country ISO3='USA'."
+
+  /operators/roaming-partners:
+    required: []
+    get:
+      summary: Discover roaming partners by TADIG
+      operationId: get-roaming-partners
+      parameters:
+        - name: tadig
+          in: query
+          required: true
+          schema:
+            type: string
+          description: TADIG code for base operator
+      responses:
+        '200':
+          description: List of potential roaming partner operators
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Operator'
+        '400':
+          description: Missing or invalid TADIG
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: "Missing required parameter: tadig."
+        '404':
+          description: Operator not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "Operator not found for tadig=ABC04."
+
+  /operators/grouped-by-e212:
+    required: []
+    get:
+      summary: Group operators by E.212 code count
+      operationId: group-by-E212
+      responses:
+        '200':
+          description: Operators grouped into small/medium/large
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  small:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Operator'
+                  medium:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Operator'
+                  large:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Operator'
+                required:
+                  - small
+                  - medium
+                  - large
+
+components:
+  schemas:
+    Operator:
+      type: object
+      properties:
+        country:
+          type: string
+          description: ISO2 or ISO3 country code
+        e164:
+          type: array
+          items:
+            type: string
+          description: List of E.164 (MSISDN)
+        e212:
+          type: array
+          items:
+            type: string
+          description: List of E.212 (IMSI)
+        iso2:
+          type: string
+          description: Two-letter ISO country code
+        iso3:
+          type: string
+          description: Three-letter ISO country code
+        name:
+          type: string
+          description: Operator display name
+        realm:
+          type: array
+          items:
+            type: string
+          description: Realm(s) for the operator
+        ip_ranges:
+          type: array
+          items:
+            type: string
+          description: IP ranges for the operator
+        tadig:
+          type: array
+          items:
+            type: string
+          description: One or more TADIG codes
+      required:
+        - country
+        - iso2
+        - iso3
+        - tadig
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: HTTP status code
+        message:
+          type: string
+          description: Descriptive error message
+      required:
+        - code
+        - message
